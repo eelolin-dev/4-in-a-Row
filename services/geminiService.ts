@@ -3,11 +3,20 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { GameBoard, Player, Difficulty, PlayerId } from '../types';
 import { checkWin, ROWS, COLS } from "../gameLogic";
 
-if (!process.env.API_KEY) {
-  throw new Error("API_KEY environment variable not set");
-}
+// Initialize AI safely. 
+// If the key is missing (e.g. build issue), we don't want to crash the entire app (blank screen).
+// We will handle the missing AI instance inside the getAIMove function.
+let ai: GoogleGenAI | null = null;
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+try {
+  if (process.env.API_KEY) {
+    ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  } else {
+    console.warn("API_KEY not set. AI features will default to random moves.");
+  }
+} catch (error) {
+  console.error("Failed to initialize Gemini AI client:", error);
+}
 
 const getRandomValidColumn = (board: GameBoard): number => {
     const validColumns = [];
@@ -58,6 +67,12 @@ const findCriticalMove = (board: GameBoard): number | null => {
 
 
 export const getAIMove = async (board: GameBoard, aiPlayer: Player, humanPlayer: Player, difficulty: Difficulty): Promise<number> => {
+  // Safety check: If AI didn't initialize, fallback to random immediately
+  if (!ai) {
+    console.warn("AI client not ready. Returning random move.");
+    return getRandomValidColumn(board);
+  }
+
   const boardString = board.map(row => 
     row.map(cell => {
       if (cell === 1) return 1; // Human
