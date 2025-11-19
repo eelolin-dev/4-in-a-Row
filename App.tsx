@@ -61,8 +61,8 @@ const App: React.FC = () => {
         const getMoveWithTimeout = () => {
             return new Promise<number>((resolve, reject) => {
                 const timeoutId = setTimeout(() => {
-                    reject(new Error('AI move timed out after 3 seconds'));
-                }, 3000); // 3-second timeout
+                    reject(new Error('AI move timed out after 10 seconds'));
+                }, 10000); // Increased to 10 seconds to allow for thinking and network latency
 
                 getAIMove(currentBoard, players[1], players[0], difficulty)
                     .then(move => {

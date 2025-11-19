@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { GameBoard, Player, Difficulty, PlayerId } from '../types';
 import { checkWin, ROWS, COLS } from "../gameLogic";
@@ -124,8 +125,8 @@ export const getAIMove = async (board: GameBoard, aiPlayer: Player, humanPlayer:
 
         Respond with ONLY a JSON object with your column choice: {"column": <number>}.
       `;
-      // Forcing a fast response by disabling thinking budget.
-      config.thinkingConfig = { thinkingBudget: 0 };
+      // Enable thinking budget for Hard difficulty to allow better reasoning
+      config.thinkingConfig = { thinkingBudget: 1024 };
       break;
   }
 
